@@ -1,0 +1,8 @@
+id;satelite;data_captura;regiao;indice_desmatamento
+50120;Amazônia-1;2026-06-15 08:12:00;AM-Oeste;14.50
+ID_INVALIDO;CBERS-4A;2026-06-15 08:15:00;PA-Sudoeste;22.10
+10402;Sentinel-2A;2026-06-15 09:05:30;MT-Norte;8.75
+30999;Landsat-9;DATA_CORROMPIDA;RO-Central;31.20
+20810;CBERS-4A;2026-06-15 10:40:15;AC-Leste;19.00
+COLUNA_FALTANDO;Amazônia-1
+15200;Aqua-MODIS;2026-06-15 11:22:05;RR-Sul;5.40

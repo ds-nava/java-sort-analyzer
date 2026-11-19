@@ -1,0 +1,29 @@
+# Build outputs
+target/
+build/
+dist/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated large datasets, local notes & temporary exports
+dados-exemplo/catalogo_1000.csv
+dados-exemplo/catalogo_10000.csv
+dados-exemplo/catalogo_100000.csv
+resultados/
+*.local.md
+*.log

@@ -1,0 +1,46 @@
+name: Build & Package Java Sort Analyzer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-jar-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compilar, testar e gerar JAR
+        run: |
+          chmod +x scripts/build.sh
+          ./scripts/build.sh
+      - name: Publicar JAR como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-sort-analyzer-jar
+          path: dist/java-sort-analyzer.jar
+
+  package-windows:
+    needs: build-jar-and-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Gerar pacote portatil Windows (.exe com Java embutido)
+        shell: cmd
+        run: scripts\package-windows.bat
+      - name: Compactar pacote Windows
+        shell: pwsh
+        run: Compress-Archive -Path dist\package-windows\JavaSortAnalyzer -DestinationPath dist\JavaSortAnalyzer-Windows.zip
+      - name: Publicar pacote Windows como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: JavaSortAnalyzer-Windows
+          path: dist/JavaSortAnalyzer-Windows.zip
