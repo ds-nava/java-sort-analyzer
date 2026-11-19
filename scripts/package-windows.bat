@@ -1,11 +1,18 @@
 @echo off
 setlocal
 
-set ROOT_DIR=%~dp0..
+for %%I in ("%~dp0..") do set "ROOT_DIR=%%~fI"
 call "%ROOT_DIR%\scripts\build.bat"
 if errorlevel 1 exit /b 1
 
-set OUT_DIR=%ROOT_DIR%\dist\package-windows
+set "INPUT_DIR=%ROOT_DIR%\build\jpackage-input"
+set "OUT_DIR=%ROOT_DIR%\dist\package-windows"
+
+if exist "%INPUT_DIR%" rmdir /s /q "%INPUT_DIR%"
+mkdir "%INPUT_DIR%"
+copy /y "%ROOT_DIR%\dist\java-sort-analyzer.jar" "%INPUT_DIR%\java-sort-analyzer.jar" >nul
+if errorlevel 1 exit /b 1
+
 if exist "%OUT_DIR%" rmdir /s /q "%OUT_DIR%"
 mkdir "%OUT_DIR%"
 
@@ -18,7 +25,7 @@ jpackage ^
   --app-version "1.0.0" ^
   --vendor "Java Sort Analyzer" ^
   --description "Sistema para Analise de Performance e Visualizacao de Algoritmos de Ordenacao" ^
-  --input "%ROOT_DIR%\dist" ^
+  --input "%INPUT_DIR%" ^
   --main-jar "java-sort-analyzer.jar" ^
   --main-class "com.sortanalyzer.Main" ^
   --dest "%OUT_DIR%"
