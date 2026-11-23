@@ -14,6 +14,9 @@ import com.sortanalyzer.sort.AlgoritmoOrdenacao;
 import com.sortanalyzer.sort.OrdenacaoCanceladaException;
 import com.sortanalyzer.sort.RegistroAlgoritmos;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.fonts.inter.FlatInterFont;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -26,15 +29,17 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -91,12 +96,11 @@ public final class AbaAnaliseCatalogo extends JPanel {
     private SwingWorker<List<ResultadoOrdenacao>, ResultadoOrdenacao> workerAtual;
 
     public AbaAnaliseCatalogo() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setBackground(TemaVisual.FUNDO_JANELA);
+        setLayout(new BorderLayout(8, 8));
+        setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
-        spinnerQuantidade = new JSpinner(new SpinnerNumberModel(10_000, 2, 500_000, 1_000));
-        spinnerQuantidade.setPreferredSize(new Dimension(105, 28));
+        spinnerQuantidade = new JSpinner(new SpinnerNumberModel(1_000, 2, 500_000, 1_000));
+        spinnerQuantidade.setPreferredSize(new Dimension(105, 26));
         comboCenarioInterno = new JComboBox<>(TipoCenario.cenariosGeracao());
         campoSeed = new JTextField(Long.toString(GeradorDados.SEED_PADRAO), 6);
 
@@ -104,11 +108,11 @@ public final class AbaAnaliseCatalogo extends JPanel {
         areaEntradaManual.setLineWrap(true);
         areaEntradaManual.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 
-        lblArquivoAtual = new JLabel("Nenhum arquivo carregado (aceita catálogo CSV com ';' ou TXT só com números).");
-        lblArquivoAtual.setForeground(TemaVisual.TEXTO_SECUNDARIO);
+        lblArquivoAtual = TemaVisual.criarRotuloSecundario(
+                "Nenhum arquivo carregado (aceita catálogo CSV com ';' ou TXT só com números).");
 
         comboCriterio = new JComboBox<>(CriterioOrdenacao.values());
-        btnExecutar = TemaVisual.criarBotaoPrimario("Executar Ordenação & Comparar");
+        btnExecutar = TemaVisual.criarBotaoPrimario("▶  Executar Ordenação & Comparar");
         btnCancelar = TemaVisual.criarBotaoPerigo("Cancelar");
         btnCancelar.setEnabled(false);
         btnExportarOrdenado = TemaVisual.criarBotaoSecundario("Exportar Ordenado (.csv)");
@@ -121,11 +125,9 @@ public final class AbaAnaliseCatalogo extends JPanel {
 
         barraProgresso = new JProgressBar(0, 100);
         barraProgresso.setStringPainted(true);
-        barraProgresso.setPreferredSize(new Dimension(180, 22));
+        barraProgresso.setPreferredSize(new Dimension(170, 20));
 
-        lblStatus = new JLabel("Carregue ou gere uma base de dados para iniciar.");
-        lblStatus.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        lblStatus.setForeground(TemaVisual.VERDE_AMAZONIA_ESCURO);
+        lblStatus = TemaVisual.criarRotuloStatus("Carregue ou gere uma base de dados para iniciar.");
 
         tabelaAntes = new PainelTabelaPaginada("Dados ANTES da Ordenação (Base Original)");
         tabelaDepois = new PainelTabelaPaginada("Dados DEPOIS da Ordenação");
@@ -149,35 +151,52 @@ public final class AbaAnaliseCatalogo extends JPanel {
     }
 
     private JPanel criarPainelSuperior() {
-        JPanel container = new JPanel(new BorderLayout(8, 8));
-        container.setOpaque(false);
+        JPanel cardUnificado = TemaVisual.criarCard(new BorderLayout(0, 6));
+        cardUnificado.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
-        JTabbedPane abasFonte = new JTabbedPane();
-        abasFonte.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        abasFonte.addTab("1. Gerador Interno (Automático)", criarPainelGeradorInterno());
-        abasFonte.addTab("2. Arquivo Externo (.csv / .txt)", criarPainelArquivoExterno());
-        abasFonte.addTab("3. Entrada Manual (Usuário)", criarPainelEntradaManual());
+        // Topo do card: seletor segmentado da fonte + conteúdo dinâmico da fonte
+        CardLayout cardLayoutFonte = new CardLayout();
+        JPanel painelConteudoFonte = new JPanel(cardLayoutFonte);
+        painelConteudoFonte.setOpaque(false);
+        painelConteudoFonte.add(criarPainelGeradorInterno(), "0");
+        painelConteudoFonte.add(criarPainelArquivoExterno(), "1");
+        painelConteudoFonte.add(criarPainelEntradaManual(), "2");
 
-        JPanel barraExecucao = new JPanel(new GridLayout(3, 1, 0, 4));
-        barraExecucao.setBackground(Color.WHITE);
-        barraExecucao.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE),
-                BorderFactory.createEmptyBorder(6, 10, 6, 10)
+        JPanel linhaFonteHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        linhaFonteHeader.setOpaque(false);
+        linhaFonteHeader.add(TemaVisual.criarEtiquetaCampo("FONTE DE DADOS:"));
+        linhaFonteHeader.add(TemaVisual.criarBarraSegmentada(
+                new String[]{"Gerador Interno", "Arquivo Externo (.csv / .txt)", "Entrada Manual"},
+                0,
+                idx -> cardLayoutFonte.show(painelConteudoFonte, String.valueOf(idx))
         ));
 
-        JPanel linhaAlgs = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 1));
+        JPanel blocoFonte = new JPanel(new BorderLayout(0, 4));
+        blocoFonte.setOpaque(false);
+        blocoFonte.add(linhaFonteHeader, BorderLayout.NORTH);
+        blocoFonte.add(painelConteudoFonte, BorderLayout.CENTER);
+
+        // Separador sutil entre fonte de dados e execução
+        JPanel blocoExecucao = new JPanel(new BorderLayout(0, 4));
+        blocoExecucao.setOpaque(false);
+        blocoExecucao.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(148, 163, 184, 70)),
+                BorderFactory.createEmptyBorder(6, 0, 0, 0)
+        ));
+
+        JPanel linhaAlgs = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linhaAlgs.setOpaque(false);
-        linhaAlgs.add(new JLabel("Algoritmos:"));
+        linhaAlgs.add(TemaVisual.criarEtiquetaCampo("ALGORITMOS:"));
         for (AlgoritmoOrdenacao alg : todosAlgoritmos) {
             JCheckBox cb = new JCheckBox(alg.getNome(), true);
             cb.setOpaque(false);
             checksAlgoritmos.add(cb);
             linhaAlgs.add(cb);
         }
-        linhaAlgs.add(new JLabel("  Critério:"));
+        linhaAlgs.add(TemaVisual.criarEtiquetaCampo("  CRITÉRIO:"));
         linhaAlgs.add(comboCriterio);
 
-        JPanel linhaAcoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 1));
+        JPanel linhaAcoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         linhaAcoes.setOpaque(false);
         linhaAcoes.add(btnExecutar);
         linhaAcoes.add(btnCancelar);
@@ -187,22 +206,25 @@ public final class AbaAnaliseCatalogo extends JPanel {
 
         JPanel linhaStatus = new JPanel(new BorderLayout(10, 0));
         linhaStatus.setOpaque(false);
-        linhaStatus.setBorder(BorderFactory.createEmptyBorder(2, 4, 0, 4));
         linhaStatus.add(barraProgresso, BorderLayout.WEST);
         linhaStatus.add(lblStatus, BorderLayout.CENTER);
 
-        barraExecucao.add(linhaAlgs);
-        barraExecucao.add(linhaAcoes);
-        barraExecucao.add(linhaStatus);
+        JPanel acoesEStatus = new JPanel(new BorderLayout(0, 5));
+        acoesEStatus.setOpaque(false);
+        acoesEStatus.add(linhaAcoes, BorderLayout.NORTH);
+        acoesEStatus.add(linhaStatus, BorderLayout.SOUTH);
 
-        container.add(abasFonte, BorderLayout.NORTH);
-        container.add(barraExecucao, BorderLayout.SOUTH);
-        return container;
+        blocoExecucao.add(linhaAlgs, BorderLayout.NORTH);
+        blocoExecucao.add(acoesEStatus, BorderLayout.SOUTH);
+
+        cardUnificado.add(blocoFonte, BorderLayout.NORTH);
+        cardUnificado.add(blocoExecucao, BorderLayout.SOUTH);
+        return cardUnificado;
     }
 
     private JPanel criarPainelGeradorInterno() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
-        p.setBackground(Color.WHITE);
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+        p.setOpaque(false);
 
         JButton btnGerar = TemaVisual.criarBotaoPrimario("Gerar Base");
         JButton btnPreset100k = TemaVisual.criarBotaoSecundario("Simular 100.000 Imagens (24h)");
@@ -217,7 +239,7 @@ public final class AbaAnaliseCatalogo extends JPanel {
         p.add(spinnerQuantidade);
         p.add(new JLabel("Disposição inicial:"));
         p.add(comboCenarioInterno);
-        p.add(new JLabel("Seed (reprodutível):"));
+        p.add(new JLabel("Seed:"));
         p.add(campoSeed);
         p.add(btnGerar);
         p.add(btnPreset100k);
@@ -225,8 +247,8 @@ public final class AbaAnaliseCatalogo extends JPanel {
     }
 
     private JPanel criarPainelArquivoExterno() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
-        p.setBackground(Color.WHITE);
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+        p.setOpaque(false);
 
         JButton btnAbrir = TemaVisual.criarBotaoPrimario("Importar Arquivo (.csv / .txt)...");
         JButton btnGerarExemplos = TemaVisual.criarBotaoSecundario("Gerar Arquivos de Exemplo...");
@@ -241,15 +263,14 @@ public final class AbaAnaliseCatalogo extends JPanel {
     }
 
     private JPanel criarPainelEntradaManual() {
-        JPanel p = new JPanel(new BorderLayout(8, 6));
-        p.setBackground(Color.WHITE);
-        p.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        JPanel p = new JPanel(new BorderLayout(8, 2));
+        p.setOpaque(false);
 
         JButton btnCarregarManual = TemaVisual.criarBotaoPrimario("Carregar Valores Digitados");
         btnCarregarManual.addActionListener(e -> acaoCarregarEntradaManual());
 
-        JLabel dica = new JLabel("Digite valores numéricos separados por vírgula, espaço ou quebra de linha:");
-        dica.setForeground(TemaVisual.TEXTO_SECUNDARIO);
+        JLabel dica = TemaVisual.criarRotuloSecundario(
+                "Digite valores numéricos separados por vírgula, espaço ou quebra de linha:");
 
         p.add(dica, BorderLayout.NORTH);
         p.add(new JScrollPane(areaEntradaManual), BorderLayout.CENTER);
@@ -267,34 +288,34 @@ public final class AbaAnaliseCatalogo extends JPanel {
         painelResultados.setOpaque(false);
 
         JTable tabelaMetricas = new JTable(modeloResultados);
-        tabelaMetricas.setRowHeight(24);
-        tabelaMetricas.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-        tabelaMetricas.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 11));
+        TemaVisual.estilizarTabela(tabelaMetricas, 26);
+        tabelaMetricas.getColumnModel().getColumn(0).setPreferredWidth(175);
+        tabelaMetricas.getColumnModel().getColumn(1).setPreferredWidth(70);
+        tabelaMetricas.getColumnModel().getColumn(2).setPreferredWidth(70);
+        tabelaMetricas.getColumnModel().getColumn(3).setPreferredWidth(54);
+        tabelaMetricas.getColumnModel().getColumn(4).setPreferredWidth(92);
+        tabelaMetricas.getColumnModel().getColumn(5).setPreferredWidth(64);
 
-        JPanel cardTabela = new JPanel(new BorderLayout());
-        cardTabela.setBackground(Color.WHITE);
-        cardTabela.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-        JLabel lblMetricas = new JLabel("  Resultados Comparativos (Tempo Exclusivo de Ordenação)");
-        lblMetricas.setOpaque(true);
-        lblMetricas.setBackground(TemaVisual.VERDE_AMAZONIA_ESCURO);
-        lblMetricas.setForeground(Color.WHITE);
-        lblMetricas.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        lblMetricas.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-        cardTabela.add(lblMetricas, BorderLayout.NORTH);
-        cardTabela.add(new JScrollPane(tabelaMetricas), BorderLayout.CENTER);
+        tabelaMetricas.getColumnModel().getColumn(0).setCellRenderer(TemaVisual.criarRendererAlgoritmo());
+        tabelaMetricas.getColumnModel().getColumn(3).setCellRenderer(TemaVisual.criarRendererAlinhado(SwingConstants.CENTER));
+        tabelaMetricas.getColumnModel().getColumn(4).setCellRenderer(TemaVisual.criarRendererTempo(this::menorTempoValido));
+        tabelaMetricas.getColumnModel().getColumn(5).setCellRenderer(TemaVisual.criarRendererValidacao());
 
-        JPanel cardGrafico = new JPanel(new BorderLayout());
-        cardGrafico.setBackground(Color.WHITE);
-        cardGrafico.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
+        JPanel cardTabela = TemaVisual.criarCard(new BorderLayout());
+        cardTabela.add(TemaVisual.criarCabecalhoCard("Resultados Comparativos (Tempo Exclusivo de Ordenação)"), BorderLayout.NORTH);
+        cardTabela.add(TemaVisual.criarScrollLimpo(tabelaMetricas), BorderLayout.CENTER);
+
+        JPanel cardGrafico = TemaVisual.criarCard(new BorderLayout());
         cardGrafico.add(painelGrafico, BorderLayout.CENTER);
 
         painelResultados.add(cardTabela);
         painelResultados.add(cardGrafico);
 
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, painelTabelas, painelResultados);
-        split.setResizeWeight(0.50);
-        split.setDividerLocation(260);
+        split.setResizeWeight(0.47);
+        split.setDividerLocation(245);
         split.setBorder(null);
+        split.putClientProperty(FlatClientProperties.STYLE, "background: null");
         return split;
     }
 
@@ -596,5 +617,15 @@ public final class AbaAnaliseCatalogo extends JPanel {
             JOptionPane.showMessageDialog(this, "Erro ao exportar gráfico: " + ex.getMessage(),
                     "Erro", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private double menorTempoValido() {
+        double min = Double.MAX_VALUE;
+        for (ResultadoOrdenacao r : ultimosResultados) {
+            if (r.isOrdenadoCorretamente() && r.getTempoMilissegundos() < min) {
+                min = r.getTempoMilissegundos();
+            }
+        }
+        return min;
     }
 }

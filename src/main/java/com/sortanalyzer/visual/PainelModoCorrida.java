@@ -50,9 +50,8 @@ public final class PainelModoCorrida extends JPanel {
     private int proximoLugarPodio = 1;
 
     public PainelModoCorrida() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setBackground(TemaVisual.FUNDO_JANELA);
+        setLayout(new BorderLayout(8, 8));
+        setOpaque(false);
 
         comboCenario = new JComboBox<>(TipoCenario.cenariosGeracao());
 
@@ -64,12 +63,12 @@ public final class PainelModoCorrida extends JPanel {
         sliderVelocidade.setOpaque(false);
         lblVelocidade = new JLabel("Velocidade: 65%");
 
-        btnIniciarPausar = TemaVisual.criarBotaoPrimario("Iniciar Corrida");
+        btnIniciarPausar = TemaVisual.criarBotaoPrimario("▶  Iniciar Corrida");
         btnReiniciar = TemaVisual.criarBotaoSecundario("Reiniciar");
         btnNovaSequencia = TemaVisual.criarBotaoSecundario("Nova Sequência");
 
         modeloPodio = new DefaultTableModel(
-                new Object[]{"Posição", "Algoritmo", "Passos", "Comp.", "Mov."}, 0) {
+                new Object[]{"#", "Algoritmo", "Passos", "Comp.", "Mov."}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -87,31 +86,34 @@ public final class PainelModoCorrida extends JPanel {
     }
 
     private JPanel criarBarraControles() {
-        JPanel container = new JPanel(new BorderLayout(6, 6));
-        container.setOpaque(false);
+        JPanel card = TemaVisual.criarCard(new BorderLayout(0, 6));
+        card.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
-        sliderQuantidade.setPreferredSize(new java.awt.Dimension(135, 26));
-        sliderVelocidade.setPreferredSize(new java.awt.Dimension(135, 26));
+        sliderQuantidade.setPreferredSize(new java.awt.Dimension(130, 24));
+        sliderVelocidade.setPreferredSize(new java.awt.Dimension(130, 24));
 
-        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
-        linha1.setBackground(Color.WHITE);
-        linha1.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-        linha1.add(new JLabel("Cenário (mesma base p/ todos):"));
+        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        linha1.setOpaque(false);
+        linha1.add(TemaVisual.criarEtiquetaCampo("CENÁRIO (MESMA BASE):"));
         linha1.add(comboCenario);
         linha1.add(lblQuantidade);
         linha1.add(sliderQuantidade);
         linha1.add(lblVelocidade);
         linha1.add(sliderVelocidade);
 
-        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linha2.setOpaque(false);
+        linha2.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(148, 163, 184, 70)),
+                BorderFactory.createEmptyBorder(6, 0, 0, 0)
+        ));
         linha2.add(btnIniciarPausar);
         linha2.add(btnReiniciar);
         linha2.add(btnNovaSequencia);
 
-        container.add(linha1, BorderLayout.NORTH);
-        container.add(linha2, BorderLayout.SOUTH);
-        return container;
+        card.add(linha1, BorderLayout.NORTH);
+        card.add(linha2, BorderLayout.SOUTH);
+        return card;
     }
 
     private JPanel criarGradeCorrida() {
@@ -120,36 +122,39 @@ public final class PainelModoCorrida extends JPanel {
 
         for (int i = 0; i < TipoAlgoritmoVisual.values().length; i++) {
             PainelBarrasCanvas p = new PainelBarrasCanvas(true);
-            p.setBorder(BorderFactory.createLineBorder(new Color(51, 65, 85), 1));
+            JPanel cardArena = TemaVisual.criarCard(new BorderLayout());
+            cardArena.add(p, BorderLayout.CENTER);
             paineis.add(p);
-            grade.add(p);
+            grade.add(cardArena);
         }
 
         // 6ª célula: Placar / Pódio em tempo real
-        JPanel painelPodio = new JPanel(new BorderLayout(4, 4));
-        painelPodio.setBackground(Color.WHITE);
-        painelPodio.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-
-        JLabel tituloPodio = new JLabel("  Placar da Corrida (Ordem de Chegada)");
-        tituloPodio.setOpaque(true);
-        tituloPodio.setBackground(TemaVisual.VERDE_AMAZONIA_ESCURO);
-        tituloPodio.setForeground(Color.WHITE);
-        tituloPodio.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        tituloPodio.setBorder(BorderFactory.createEmptyBorder(7, 6, 7, 6));
+        JPanel painelPodio = TemaVisual.criarCard(new BorderLayout());
 
         JTable tabelaPodio = new JTable(modeloPodio);
-        tabelaPodio.setRowHeight(24);
-        tabelaPodio.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
-        tabelaPodio.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 11));
-        tabelaPodio.getColumnModel().getColumn(0).setPreferredWidth(52);
-        tabelaPodio.getColumnModel().getColumn(1).setPreferredWidth(130);
+        TemaVisual.estilizarTabela(tabelaPodio, 24);
+        tabelaPodio.setFont(new Font(com.formdev.flatlaf.fonts.inter.FlatInterFont.FAMILY, Font.PLAIN, 11));
+        tabelaPodio.getColumnModel().getColumn(0).setPreferredWidth(34);
+        tabelaPodio.getColumnModel().getColumn(0).setMaxWidth(42);
+        tabelaPodio.getColumnModel().getColumn(1).setPreferredWidth(135);
+        tabelaPodio.getColumnModel().getColumn(2).setPreferredWidth(62);
+        tabelaPodio.getColumnModel().getColumn(3).setPreferredWidth(60);
+        tabelaPodio.getColumnModel().getColumn(4).setPreferredWidth(60);
 
-        JLabel nota = new JLabel("<html><div style='padding:4px 8px;color:#475569;font-size:10px;'>"
-                + "Todos os 5 algoritmos avançam o mesmo número de passos por quadro sobre a mesma sequência inicial."
-                + "</div></html>");
+        tabelaPodio.getColumnModel().getColumn(0).setCellRenderer(TemaVisual.criarRendererAlinhado(javax.swing.SwingConstants.CENTER));
+        tabelaPodio.getColumnModel().getColumn(1).setCellRenderer(TemaVisual.criarRendererAlgoritmo());
+        javax.swing.table.TableCellRenderer direita = TemaVisual.criarRendererAlinhado(javax.swing.SwingConstants.RIGHT);
+        tabelaPodio.getColumnModel().getColumn(2).setCellRenderer(direita);
+        tabelaPodio.getColumnModel().getColumn(3).setCellRenderer(direita);
+        tabelaPodio.getColumnModel().getColumn(4).setCellRenderer(direita);
 
-        painelPodio.add(tituloPodio, BorderLayout.NORTH);
-        painelPodio.add(new JScrollPane(tabelaPodio), BorderLayout.CENTER);
+        JLabel nota = TemaVisual.criarRotuloSecundario(
+                "<html><div style='padding:6px 10px;'>"
+                        + "Inicie a corrida para acompanhar a ordem de chegada. Todos avançam o mesmo número de passos por quadro."
+                        + "</div></html>");
+
+        painelPodio.add(TemaVisual.criarCabecalhoCard("Placar da Corrida (Ordem de Chegada)"), BorderLayout.NORTH);
+        painelPodio.add(TemaVisual.criarScrollLimpo(tabelaPodio), BorderLayout.CENTER);
         painelPodio.add(nota, BorderLayout.SOUTH);
 
         grade.add(painelPodio);
@@ -215,7 +220,7 @@ public final class PainelModoCorrida extends JPanel {
             }
             atualizarTimerDelay();
             timer.start();
-            btnIniciarPausar.setText("Pausar");
+            btnIniciarPausar.setText("⏸  Pausar");
         }
     }
 
@@ -223,7 +228,7 @@ public final class PainelModoCorrida extends JPanel {
         if (timer.isRunning()) {
             timer.stop();
         }
-        btnIniciarPausar.setText("Iniciar Corrida");
+        btnIniciarPausar.setText("▶  Iniciar Corrida");
     }
 
     private void atualizarTimerDelay() {

@@ -12,7 +12,7 @@ import java.util.Locale;
 public final class TabelaCatalogoModel extends AbstractTableModel {
 
     private static final String[] COLUNAS = {
-            "#", "ID Imagem", "Satélite", "Data/Hora Captura (UTC)", "Região", "Índice (%)"
+            "#", "ID Imagem", "Satélite", "Data/Hora (UTC)", "Região", "Índice (%)"
     };
 
     private ImagemSatelite[] dados = new ImagemSatelite[0];

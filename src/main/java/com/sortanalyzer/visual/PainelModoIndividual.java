@@ -47,9 +47,8 @@ public final class PainelModoIndividual extends JPanel {
     private ReprodutorAnimacao reprodutor;
 
     public PainelModoIndividual() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setBackground(TemaVisual.FUNDO_JANELA);
+        setLayout(new BorderLayout(8, 8));
+        setOpaque(false);
 
         comboAlgoritmo = new JComboBox<>(TipoAlgoritmoVisual.values());
         comboCenario = new JComboBox<>(TipoCenario.cenariosGeracao());
@@ -62,25 +61,26 @@ public final class PainelModoIndividual extends JPanel {
         sliderVelocidade.setOpaque(false);
         lblVelocidade = new JLabel("Velocidade: 45%");
 
-        btnPlayPause = TemaVisual.criarBotaoPrimario("Iniciar");
-        btnVoltar = TemaVisual.criarBotaoSecundario("< Passo");
-        btnAvancar = TemaVisual.criarBotaoSecundario("Passo >");
+        btnPlayPause = TemaVisual.criarBotaoPrimario("▶  Iniciar");
+        btnVoltar = TemaVisual.criarBotaoSecundario("‹ Passo");
+        btnAvancar = TemaVisual.criarBotaoSecundario("Passo ›");
         btnReiniciar = TemaVisual.criarBotaoSecundario("Reiniciar");
         btnNovaSequencia = TemaVisual.criarBotaoSecundario("Nova Sequência");
 
         canvas = new PainelBarrasCanvas(false);
         lblDescricaoPasso = new JLabel(" ");
         lblDescricaoPasso.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        lblDescricaoPasso.setForeground(TemaVisual.TEXTO_PRINCIPAL);
-        lblDescricaoPasso.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE),
-                BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+        lblDescricaoPasso.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE,
+                "arc: 8; "
+                        + "[light]background: #FFFFFF; [light]foreground: #0F172A; [light]border: 8,12,8,12,#E2E8F0,1,8; "
+                        + "[dark]background: #1E293B; [dark]foreground: #F1F5F9; [dark]border: 8,12,8,12,#334155,1,8");
         lblDescricaoPasso.setOpaque(true);
-        lblDescricaoPasso.setBackground(Color.WHITE);
+
+        JPanel cardCanvas = TemaVisual.criarCard(new BorderLayout());
+        cardCanvas.add(canvas, BorderLayout.CENTER);
 
         add(criarBarraControles(), BorderLayout.NORTH);
-        add(canvas, BorderLayout.CENTER);
+        add(cardCanvas, BorderLayout.CENTER);
         add(criarRodape(), BorderLayout.SOUTH);
 
         timer = new Timer(40, e -> aoTickTimer());
@@ -90,24 +90,27 @@ public final class PainelModoIndividual extends JPanel {
     }
 
     private JPanel criarBarraControles() {
-        JPanel container = new JPanel(new BorderLayout(6, 6));
-        container.setOpaque(false);
+        JPanel card = TemaVisual.criarCard(new BorderLayout(0, 6));
+        card.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
-        sliderQuantidade.setPreferredSize(new java.awt.Dimension(135, 26));
-        sliderVelocidade.setPreferredSize(new java.awt.Dimension(135, 26));
+        sliderQuantidade.setPreferredSize(new java.awt.Dimension(130, 24));
+        sliderVelocidade.setPreferredSize(new java.awt.Dimension(130, 24));
 
-        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
-        linha1.setBackground(Color.WHITE);
-        linha1.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-        linha1.add(new JLabel("Algoritmo:"));
+        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        linha1.setOpaque(false);
+        linha1.add(TemaVisual.criarEtiquetaCampo("ALGORITMO:"));
         linha1.add(comboAlgoritmo);
-        linha1.add(new JLabel("Cenário:"));
+        linha1.add(TemaVisual.criarEtiquetaCampo("CENÁRIO:"));
         linha1.add(comboCenario);
         linha1.add(lblQuantidade);
         linha1.add(sliderQuantidade);
 
-        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linha2.setOpaque(false);
+        linha2.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(148, 163, 184, 70)),
+                BorderFactory.createEmptyBorder(6, 0, 0, 0)
+        ));
         linha2.add(btnPlayPause);
         linha2.add(btnVoltar);
         linha2.add(btnAvancar);
@@ -117,9 +120,9 @@ public final class PainelModoIndividual extends JPanel {
         linha2.add(lblVelocidade);
         linha2.add(sliderVelocidade);
 
-        container.add(linha1, BorderLayout.NORTH);
-        container.add(linha2, BorderLayout.SOUTH);
-        return container;
+        card.add(linha1, BorderLayout.NORTH);
+        card.add(linha2, BorderLayout.SOUTH);
+        return card;
     }
 
     private JPanel criarRodape() {
@@ -146,11 +149,10 @@ public final class PainelModoIndividual extends JPanel {
         item.setOpaque(false);
         JPanel quadrado = new JPanel();
         quadrado.setBackground(cor);
-        quadrado.setPreferredSize(new java.awt.Dimension(13, 13));
-        quadrado.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        quadrado.setPreferredSize(new java.awt.Dimension(12, 12));
+        quadrado.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE, "arc: 4");
         item.add(quadrado);
-        JLabel lbl = new JLabel(texto);
-        lbl.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+        JLabel lbl = TemaVisual.criarRotuloSecundario(texto);
         item.add(lbl);
         return item;
     }
@@ -214,7 +216,7 @@ public final class PainelModoIndividual extends JPanel {
             }
             atualizarTimerDelay();
             timer.start();
-            btnPlayPause.setText("Pausar");
+            btnPlayPause.setText("⏸  Pausar");
         }
     }
 
@@ -222,7 +224,7 @@ public final class PainelModoIndividual extends JPanel {
         if (timer.isRunning()) {
             timer.stop();
         }
-        btnPlayPause.setText("Iniciar");
+        btnPlayPause.setText("▶  Iniciar");
     }
 
     private void atualizarTimerDelay() {

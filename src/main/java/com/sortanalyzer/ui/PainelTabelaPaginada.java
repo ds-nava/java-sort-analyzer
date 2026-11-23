@@ -1,15 +1,19 @@
 package com.sortanalyzer.ui;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.fonts.inter.FlatInterFont;
 import com.sortanalyzer.model.ImagemSatelite;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 
@@ -27,38 +31,38 @@ public final class PainelTabelaPaginada extends JPanel {
     private final JButton btnUltima;
 
     public PainelTabelaPaginada(String titulo) {
-        setLayout(new BorderLayout(4, 4));
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-
-        JLabel lblTitulo = new JLabel("  " + titulo);
-        lblTitulo.setOpaque(true);
-        lblTitulo.setBackground(TemaVisual.VERDE_AMAZONIA_ESCURO);
-        lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        lblTitulo.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        setLayout(new BorderLayout(0, 0));
+        putClientProperty(FlatClientProperties.STYLE,
+                "arc: 10; "
+                        + "[light]background: #FFFFFF; [light]border: 1,1,1,1,#E2E8F0,1,10; "
+                        + "[dark]background: #1E293B; [dark]border: 1,1,1,1,#334155,1,10");
 
         modelo = new TabelaCatalogoModel();
         JTable tabela = new JTable(modelo);
-        tabela.setRowHeight(22);
-        tabela.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
-        tabela.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 11));
-        tabela.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tabela.getColumnModel().getColumn(1).setPreferredWidth(75);
-        tabela.getColumnModel().getColumn(2).setPreferredWidth(90);
-        tabela.getColumnModel().getColumn(3).setPreferredWidth(130);
-        tabela.getColumnModel().getColumn(4).setPreferredWidth(80);
-        tabela.getColumnModel().getColumn(5).setPreferredWidth(70);
+        TemaVisual.estilizarTabela(tabela, 23);
+        tabela.setFont(new Font(FlatInterFont.FAMILY, Font.PLAIN, 11));
+        tabela.getColumnModel().getColumn(0).setPreferredWidth(44);
+        tabela.getColumnModel().getColumn(1).setPreferredWidth(76);
+        tabela.getColumnModel().getColumn(2).setPreferredWidth(88);
+        tabela.getColumnModel().getColumn(3).setPreferredWidth(135);
+        tabela.getColumnModel().getColumn(4).setPreferredWidth(84);
+        tabela.getColumnModel().getColumn(5).setPreferredWidth(68);
+
+        javax.swing.table.TableCellRenderer direita = TemaVisual.criarRendererAlinhado(SwingConstants.RIGHT);
+        tabela.getColumnModel().getColumn(0).setCellRenderer(direita);
+        tabela.getColumnModel().getColumn(1).setCellRenderer(direita);
+        tabela.getColumnModel().getColumn(5).setCellRenderer(direita);
 
         JPanel rodape = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
-        rodape.setBackground(new Color(248, 250, 252));
+        rodape.putClientProperty(FlatClientProperties.STYLE,
+                "[light]background: #F8FAFC; [dark]background: #182234");
+        rodape.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(148, 163, 184, 70)));
 
-        btnPrimeira = new JButton("<<");
-        btnAnterior = new JButton("<");
-        btnProxima = new JButton(">");
-        btnUltima = new JButton(">>");
-        lblInfoPagina = new JLabel("0 registros");
-        lblInfoPagina.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+        btnPrimeira = criarBotaoPaginacao("«");
+        btnAnterior = criarBotaoPaginacao("‹");
+        btnProxima = criarBotaoPaginacao("›");
+        btnUltima = criarBotaoPaginacao("»");
+        lblInfoPagina = TemaVisual.criarRotuloSecundario("Nenhum dado carregado");
 
         btnPrimeira.addActionListener(e -> irParaPagina(0));
         btnAnterior.addActionListener(e -> irParaPagina(modelo.getPaginaAtual() - 1));
@@ -71,11 +75,22 @@ public final class PainelTabelaPaginada extends JPanel {
         rodape.add(btnProxima);
         rodape.add(btnUltima);
 
-        add(lblTitulo, BorderLayout.NORTH);
-        add(new JScrollPane(tabela), BorderLayout.CENTER);
+        add(TemaVisual.criarCabecalhoCard(titulo), BorderLayout.NORTH);
+        add(TemaVisual.criarScrollLimpo(tabela), BorderLayout.CENTER);
         add(rodape, BorderLayout.SOUTH);
 
         atualizarBotoes();
+    }
+
+    private static JButton criarBotaoPaginacao(String simbolo) {
+        JButton b = new JButton(simbolo);
+        b.setFont(new Font(FlatInterFont.FAMILY, Font.BOLD, 12));
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 6; margin: 2,8,2,8; borderWidth: 1; "
+                        + "[light]background: #FFFFFF; [light]borderColor: #CBD5E1; [light]foreground: #334155; "
+                        + "[dark]background: #1E293B; [dark]borderColor: #475569; [dark]foreground: #E2E8F0");
+        return b;
     }
 
     public void setDados(ImagemSatelite[] dados) {
@@ -94,7 +109,7 @@ public final class PainelTabelaPaginada extends JPanel {
         int totalPags = modelo.getTotalPaginas();
 
         if (total == 0) {
-            lblInfoPagina.setText("Nenhum dado carregado");
+            lblInfoPagina.setText("Execute a ordenação para visualizar");
         } else {
             lblInfoPagina.setText(String.format("Página %,d / %,d  (%,d itens)", pagAtual + 1, totalPags, total));
         }

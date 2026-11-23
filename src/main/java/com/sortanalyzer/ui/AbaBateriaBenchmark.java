@@ -76,9 +76,8 @@ public final class AbaBateriaBenchmark extends JPanel {
     private SwingWorker<List<ResultadoOrdenacao>, ResultadoOrdenacao> workerAtual;
 
     public AbaBateriaBenchmark() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setBackground(TemaVisual.FUNDO_JANELA);
+        setLayout(new BorderLayout(8, 8));
+        setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
         comboCriterio = new JComboBox<>(CriterioOrdenacao.values());
         spinnerRepeticoes = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
@@ -92,7 +91,7 @@ public final class AbaBateriaBenchmark extends JPanel {
         chkWarmUp = new JCheckBox("Aquecimento JVM (Warm-up)", true);
         chkWarmUp.setOpaque(false);
 
-        btnExecutar = TemaVisual.criarBotaoPrimario("Executar Bateria");
+        btnExecutar = TemaVisual.criarBotaoPrimario("▶  Executar Bateria");
         btnCancelar = TemaVisual.criarBotaoPerigo("Cancelar");
         btnCancelar.setEnabled(false);
         btnExportarCsv = TemaVisual.criarBotaoSecundario("Exportar CSV");
@@ -102,11 +101,9 @@ public final class AbaBateriaBenchmark extends JPanel {
 
         barraProgresso = new JProgressBar(0, 100);
         barraProgresso.setStringPainted(true);
-        barraProgresso.setPreferredSize(new Dimension(180, 22));
+        barraProgresso.setPreferredSize(new Dimension(170, 20));
 
-        lblStatus = new JLabel("Configure a matriz de testes e clique em Executar Bateria.");
-        lblStatus.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        lblStatus.setForeground(TemaVisual.VERDE_AMAZONIA_ESCURO);
+        lblStatus = TemaVisual.criarRotuloStatus("Configure a matriz de testes e clique em Executar Bateria.");
 
         modeloTabela = new DefaultTableModel(
                 new Object[]{"Tamanho", "Cenário", "Algoritmo", "Complexidade", "Tempo Médio (ms)", "Reps", "Validação"}, 0) {
@@ -117,6 +114,8 @@ public final class AbaBateriaBenchmark extends JPanel {
         };
 
         filtroTamanhoGrafico = new JComboBox<>();
+        filtroTamanhoGrafico.setPreferredSize(new Dimension(105, 26));
+        filtroTamanhoGrafico.setEnabled(false);
         filtroCenarioGrafico = new JComboBox<>(TipoCenario.cenariosGeracao());
         chkEscalaLog = new JCheckBox("Escala Log", true);
         chkEscalaLog.setOpaque(false);
@@ -131,32 +130,28 @@ public final class AbaBateriaBenchmark extends JPanel {
     }
 
     private JPanel criarPainelConfiguracao() {
-        JPanel card = new JPanel(new BorderLayout(4, 4));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)
-        ));
+        JPanel card = TemaVisual.criarCard(new BorderLayout(0, 6));
+        card.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
-        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 1));
+        JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linha1.setOpaque(false);
-        linha1.add(new JLabel("Tamanhos:"));
+        linha1.add(TemaVisual.criarEtiquetaCampo("TAMANHOS:"));
         for (int tam : TAMANHOS_PADRAO) {
             JCheckBox cb = new JCheckBox(String.format("%,d", tam), true);
             cb.setOpaque(false);
             checksTamanhos.add(cb);
             linha1.add(cb);
         }
-        linha1.add(new JLabel("  Critério:"));
+        linha1.add(TemaVisual.criarEtiquetaCampo("  CRITÉRIO:"));
         linha1.add(comboCriterio);
-        linha1.add(new JLabel("  Reps:"));
+        linha1.add(TemaVisual.criarEtiquetaCampo("  REPS:"));
         linha1.add(spinnerRepeticoes);
-        linha1.add(new JLabel("  Seed:"));
+        linha1.add(TemaVisual.criarEtiquetaCampo("  SEED:"));
         linha1.add(campoSeed);
 
-        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 1));
+        JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linha2.setOpaque(false);
-        linha2.add(new JLabel("Cenários:"));
+        linha2.add(TemaVisual.criarEtiquetaCampo("CENÁRIOS:"));
         for (TipoCenario c : TipoCenario.cenariosGeracao()) {
             JCheckBox cb = new JCheckBox(c.getRotulo(), true);
             cb.setOpaque(false);
@@ -165,9 +160,9 @@ public final class AbaBateriaBenchmark extends JPanel {
         }
         linha2.add(chkWarmUp);
 
-        JPanel linha3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 1));
+        JPanel linha3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         linha3.setOpaque(false);
-        linha3.add(new JLabel("Algoritmos:"));
+        linha3.add(TemaVisual.criarEtiquetaCampo("ALGORITMOS:"));
         for (AlgoritmoOrdenacao alg : todosAlgoritmos) {
             JCheckBox cb = new JCheckBox(alg.getNome(), true);
             cb.setOpaque(false);
@@ -176,8 +171,12 @@ public final class AbaBateriaBenchmark extends JPanel {
         }
         linha3.add(chkRepeticoesInteligentes);
 
-        JPanel linha4 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+        JPanel linha4 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         linha4.setOpaque(false);
+        linha4.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(148, 163, 184, 70)),
+                BorderFactory.createEmptyBorder(6, 0, 0, 0)
+        ));
         JButton btnPresetRapido = TemaVisual.criarBotaoSecundario("Preset Rápido (1k–10k)");
         JButton btnPresetCompleto = TemaVisual.criarBotaoSecundario("Preset Completo (1k–100k)");
         btnPresetRapido.addActionListener(e -> aplicarPreset(false));
@@ -192,49 +191,49 @@ public final class AbaBateriaBenchmark extends JPanel {
 
         JPanel linhaStatus = new JPanel(new BorderLayout(10, 0));
         linhaStatus.setOpaque(false);
-        linhaStatus.setBorder(BorderFactory.createEmptyBorder(3, 4, 0, 4));
         linhaStatus.add(barraProgresso, BorderLayout.WEST);
         linhaStatus.add(lblStatus, BorderLayout.CENTER);
 
-        JPanel linhas = new JPanel(new java.awt.GridLayout(4, 1, 0, 2));
+        JPanel linhas = new JPanel(new java.awt.GridLayout(3, 1, 0, 3));
         linhas.setOpaque(false);
         linhas.add(linha1);
         linhas.add(linha2);
         linhas.add(linha3);
-        linhas.add(linha4);
 
-        card.add(linhas, BorderLayout.CENTER);
-        card.add(linhaStatus, BorderLayout.SOUTH);
+        JPanel rodapeAcoes = new JPanel(new BorderLayout(0, 6));
+        rodapeAcoes.setOpaque(false);
+        rodapeAcoes.add(linha4, BorderLayout.NORTH);
+        rodapeAcoes.add(linhaStatus, BorderLayout.SOUTH);
+
+        card.add(linhas, BorderLayout.NORTH);
+        card.add(rodapeAcoes, BorderLayout.SOUTH);
         return card;
     }
 
     private JSplitPane criarPainelResultados() {
         JTable tabela = new JTable(modeloTabela);
-        tabela.setRowHeight(23);
-        tabela.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-        tabela.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 11));
+        TemaVisual.estilizarTabela(tabela, 24);
 
-        JPanel cardTabela = new JPanel(new BorderLayout());
-        cardTabela.setBackground(Color.WHITE);
-        cardTabela.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
-        JLabel titTab = new JLabel("  Resultados Consolidados da Bateria");
-        titTab.setOpaque(true);
-        titTab.setBackground(TemaVisual.VERDE_AMAZONIA_ESCURO);
-        titTab.setForeground(Color.WHITE);
-        titTab.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        titTab.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-        cardTabela.add(titTab, BorderLayout.NORTH);
-        cardTabela.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        javax.swing.table.TableCellRenderer direita = TemaVisual.criarRendererAlinhado(javax.swing.SwingConstants.RIGHT);
+        tabela.getColumnModel().getColumn(0).setCellRenderer(direita);
+        tabela.getColumnModel().getColumn(2).setCellRenderer(TemaVisual.criarRendererAlgoritmo());
+        tabela.getColumnModel().getColumn(4).setCellRenderer(direita);
+        tabela.getColumnModel().getColumn(5).setCellRenderer(direita);
+        tabela.getColumnModel().getColumn(6).setCellRenderer(TemaVisual.criarRendererValidacao());
 
-        JPanel cardGrafico = new JPanel(new BorderLayout());
-        cardGrafico.setBackground(Color.WHITE);
-        cardGrafico.setBorder(BorderFactory.createLineBorder(TemaVisual.BORDA_SUAVE));
+        JPanel cardTabela = TemaVisual.criarCard(new BorderLayout());
+        cardTabela.add(TemaVisual.criarCabecalhoCard("Resultados Consolidados da Bateria"), BorderLayout.NORTH);
+        cardTabela.add(TemaVisual.criarScrollLimpo(tabela), BorderLayout.CENTER);
 
-        JPanel barraFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
-        barraFiltro.setBackground(new Color(248, 250, 252));
-        barraFiltro.add(new JLabel("Filtrar gráfico — Tamanho:"));
+        JPanel cardGrafico = TemaVisual.criarCard(new BorderLayout());
+
+        JPanel barraFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        barraFiltro.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE,
+                "[light]background: #F8FAFC; [dark]background: #182234");
+        barraFiltro.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(148, 163, 184, 70)));
+        barraFiltro.add(TemaVisual.criarEtiquetaCampo("FILTRAR GRÁFICO — TAMANHO:"));
         barraFiltro.add(filtroTamanhoGrafico);
-        barraFiltro.add(new JLabel("Cenário:"));
+        barraFiltro.add(TemaVisual.criarEtiquetaCampo("CENÁRIO:"));
         barraFiltro.add(filtroCenarioGrafico);
         barraFiltro.add(chkEscalaLog);
 
@@ -242,9 +241,10 @@ public final class AbaBateriaBenchmark extends JPanel {
         cardGrafico.add(painelGrafico, BorderLayout.CENTER);
 
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, cardTabela, cardGrafico);
-        split.setResizeWeight(0.48);
+        split.setResizeWeight(0.46);
         split.setDividerLocation(230);
         split.setBorder(null);
+        split.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE, "background: null");
         return split;
     }
 
@@ -324,6 +324,7 @@ public final class AbaBateriaBenchmark extends JPanel {
         modeloTabela.setRowCount(0);
         filtroTamanhoGrafico.removeAllItems();
         for (Integer t : tamanhos) filtroTamanhoGrafico.addItem(t);
+        filtroTamanhoGrafico.setEnabled(!tamanhos.isEmpty());
         if (!cenarios.isEmpty()) filtroCenarioGrafico.setSelectedItem(cenarios.get(0));
 
         barraProgresso.setValue(0);
