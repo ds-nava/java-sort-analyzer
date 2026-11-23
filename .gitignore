@@ -3,6 +3,7 @@ target/
 build/
 dist/
 out/
+.deps/
 *.class
 *.jar
 *.war
