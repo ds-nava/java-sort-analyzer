@@ -48,17 +48,22 @@ public final class Main {
             }
             case "--benchmark" -> {
                 boolean rapido = false;
+                boolean uniforme = false;
                 String caminhoCsv = "resultados/benchmark.csv";
                 for (int i = 1; i < args.length; i++) {
                     if ("--rapido".equalsIgnoreCase(args[i])) {
                         rapido = true;
+                    } else if ("--uniforme".equalsIgnoreCase(args[i])) {
+                        uniforme = true;
                     } else {
                         caminhoCsv = args[i];
                     }
                 }
                 ConfiguracaoBateria config = rapido
                         ? ConfiguracaoBateria.rapida()
-                        : ConfiguracaoBateria.padraoCompleto();
+                        : (uniforme
+                                ? ConfiguracaoBateria.padraoCompletoUniforme()
+                                : ConfiguracaoBateria.padraoCompleto());
 
                 System.out.println("=== Java Sort Analyzer | Benchmark Headless ===");
                 System.out.printf("Java %s | OS: %s (%s) | CPUs: %d%n",
@@ -108,8 +113,9 @@ public final class Main {
                   java -jar java-sort-analyzer.jar --gerar-dados [pasta]
                       Gera arquivos externos de teste (1k, 10k, 100k, números simples e arquivo com erros).
 
-                  java -jar java-sort-analyzer.jar --benchmark [saida.csv] [--rapido]
+                  java -jar java-sort-analyzer.jar --benchmark [saida.csv] [--rapido | --uniforme]
                       Executa a bateria de benchmark em linha de comando e exporta CSV.
+                      --uniforme força 3 repetições inclusive para O(n²) em 50k e 100k.
                 """);
     }
 }

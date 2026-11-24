@@ -65,6 +65,19 @@ public final class ConfiguracaoBateria {
         );
     }
 
+    public static ConfiguracaoBateria padraoCompletoUniforme() {
+        return new ConfiguracaoBateria(
+                List.of(1_000, 10_000, 50_000, 100_000),
+                Arrays.asList(TipoCenario.cenariosGeracao()),
+                RegistroAlgoritmos.todos(),
+                CriterioOrdenacao.ID,
+                GeradorDados.SEED_PADRAO,
+                3,
+                false,
+                true
+        );
+    }
+
     public static ConfiguracaoBateria rapida() {
         return new ConfiguracaoBateria(
                 List.of(1_000, 5_000, 10_000),

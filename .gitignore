@@ -25,6 +25,7 @@ Thumbs.db
 dados-exemplo/catalogo_1000.csv
 dados-exemplo/catalogo_10000.csv
 dados-exemplo/catalogo_100000.csv
-resultados/
+/resultados/
+contexto_pesquisa.md
 *.local.md
 *.log

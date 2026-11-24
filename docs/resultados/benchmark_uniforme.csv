@@ -1,0 +1,81 @@
+﻿algoritmo;complexidade_media;complexidade_pior;estavel;tamanho;cenario;criterio;tempo_ms;repeticoes;verificacao
+Bubble Sort;O(n²);O(n²);Sim;1000;Aleatório;ID da Imagem;20.6270;3;OK
+Insertion Sort;O(n²);O(n²);Sim;1000;Aleatório;ID da Imagem;8.8773;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;1000;Aleatório;ID da Imagem;0.8664;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;1000;Aleatório;ID da Imagem;1.0835;3;OK
+Heap Sort;O(n log n);O(n log n);Não;1000;Aleatório;ID da Imagem;0.7302;3;OK
+Bubble Sort;O(n²);O(n²);Sim;1000;Já Ordenado;ID da Imagem;0.0506;3;OK
+Insertion Sort;O(n²);O(n²);Sim;1000;Já Ordenado;ID da Imagem;0.0639;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;1000;Já Ordenado;ID da Imagem;0.0808;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;1000;Já Ordenado;ID da Imagem;0.6338;3;OK
+Heap Sort;O(n log n);O(n log n);Não;1000;Já Ordenado;ID da Imagem;1.3731;3;OK
+Bubble Sort;O(n²);O(n²);Sim;1000;Inversamente Ordenado;ID da Imagem;29.8442;3;OK
+Insertion Sort;O(n²);O(n²);Sim;1000;Inversamente Ordenado;ID da Imagem;12.3525;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;1000;Inversamente Ordenado;ID da Imagem;0.3303;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;1000;Inversamente Ordenado;ID da Imagem;1.7247;3;OK
+Heap Sort;O(n log n);O(n log n);Não;1000;Inversamente Ordenado;ID da Imagem;0.9220;3;OK
+Bubble Sort;O(n²);O(n²);Sim;1000;Semi-Ordenado (90%);ID da Imagem;8.4339;3;OK
+Insertion Sort;O(n²);O(n²);Sim;1000;Semi-Ordenado (90%);ID da Imagem;0.1485;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;1000;Semi-Ordenado (90%);ID da Imagem;0.2661;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;1000;Semi-Ordenado (90%);ID da Imagem;0.4268;3;OK
+Heap Sort;O(n log n);O(n log n);Não;1000;Semi-Ordenado (90%);ID da Imagem;0.2276;3;OK
+Bubble Sort;O(n²);O(n²);Sim;10000;Aleatório;ID da Imagem;407.0447;3;OK
+Insertion Sort;O(n²);O(n²);Sim;10000;Aleatório;ID da Imagem;98.9086;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;10000;Aleatório;ID da Imagem;4.4321;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;10000;Aleatório;ID da Imagem;2.1048;3;OK
+Heap Sort;O(n log n);O(n log n);Não;10000;Aleatório;ID da Imagem;3.1562;3;OK
+Bubble Sort;O(n²);O(n²);Sim;10000;Já Ordenado;ID da Imagem;0.0636;3;OK
+Insertion Sort;O(n²);O(n²);Sim;10000;Já Ordenado;ID da Imagem;0.0757;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;10000;Já Ordenado;ID da Imagem;0.1110;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;10000;Já Ordenado;ID da Imagem;0.8689;3;OK
+Heap Sort;O(n log n);O(n log n);Não;10000;Já Ordenado;ID da Imagem;2.0175;3;OK
+Bubble Sort;O(n²);O(n²);Sim;10000;Inversamente Ordenado;ID da Imagem;340.4330;3;OK
+Insertion Sort;O(n²);O(n²);Sim;10000;Inversamente Ordenado;ID da Imagem;199.1311;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;10000;Inversamente Ordenado;ID da Imagem;1.2048;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;10000;Inversamente Ordenado;ID da Imagem;0.4827;3;OK
+Heap Sort;O(n log n);O(n log n);Não;10000;Inversamente Ordenado;ID da Imagem;1.9462;3;OK
+Bubble Sort;O(n²);O(n²);Sim;10000;Semi-Ordenado (90%);ID da Imagem;188.9022;3;OK
+Insertion Sort;O(n²);O(n²);Sim;10000;Semi-Ordenado (90%);ID da Imagem;11.1910;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;10000;Semi-Ordenado (90%);ID da Imagem;0.9851;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;10000;Semi-Ordenado (90%);ID da Imagem;0.5901;3;OK
+Heap Sort;O(n log n);O(n log n);Não;10000;Semi-Ordenado (90%);ID da Imagem;2.1968;3;OK
+Bubble Sort;O(n²);O(n²);Sim;50000;Aleatório;ID da Imagem;16322.5870;3;OK
+Insertion Sort;O(n²);O(n²);Sim;50000;Aleatório;ID da Imagem;3263.5925;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;50000;Aleatório;ID da Imagem;13.7747;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;50000;Aleatório;ID da Imagem;11.5857;3;OK
+Heap Sort;O(n log n);O(n log n);Não;50000;Aleatório;ID da Imagem;18.1161;3;OK
+Bubble Sort;O(n²);O(n²);Sim;50000;Já Ordenado;ID da Imagem;1.6381;3;OK
+Insertion Sort;O(n²);O(n²);Sim;50000;Já Ordenado;ID da Imagem;0.8041;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;50000;Já Ordenado;ID da Imagem;1.1414;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;50000;Já Ordenado;ID da Imagem;4.4174;3;OK
+Heap Sort;O(n log n);O(n log n);Não;50000;Já Ordenado;ID da Imagem;11.9204;3;OK
+Bubble Sort;O(n²);O(n²);Sim;50000;Inversamente Ordenado;ID da Imagem;11412.0459;3;OK
+Insertion Sort;O(n²);O(n²);Sim;50000;Inversamente Ordenado;ID da Imagem;6954.2947;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;50000;Inversamente Ordenado;ID da Imagem;8.6312;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;50000;Inversamente Ordenado;ID da Imagem;3.7344;3;OK
+Heap Sort;O(n log n);O(n log n);Não;50000;Inversamente Ordenado;ID da Imagem;13.1407;3;OK
+Bubble Sort;O(n²);O(n²);Sim;50000;Semi-Ordenado (90%);ID da Imagem;8068.8765;3;OK
+Insertion Sort;O(n²);O(n²);Sim;50000;Semi-Ordenado (90%);ID da Imagem;354.3589;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;50000;Semi-Ordenado (90%);ID da Imagem;6.3553;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;50000;Semi-Ordenado (90%);ID da Imagem;3.5751;3;OK
+Heap Sort;O(n log n);O(n log n);Não;50000;Semi-Ordenado (90%);ID da Imagem;12.5893;3;OK
+Bubble Sort;O(n²);O(n²);Sim;100000;Aleatório;ID da Imagem;73140.3833;3;OK
+Insertion Sort;O(n²);O(n²);Sim;100000;Aleatório;ID da Imagem;19610.2117;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;100000;Aleatório;ID da Imagem;55.9998;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;100000;Aleatório;ID da Imagem;31.6210;3;OK
+Heap Sort;O(n log n);O(n log n);Não;100000;Aleatório;ID da Imagem;48.5362;3;OK
+Bubble Sort;O(n²);O(n²);Sim;100000;Já Ordenado;ID da Imagem;1.8625;3;OK
+Insertion Sort;O(n²);O(n²);Sim;100000;Já Ordenado;ID da Imagem;2.8082;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;100000;Já Ordenado;ID da Imagem;5.2247;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;100000;Já Ordenado;ID da Imagem;9.1471;3;OK
+Heap Sort;O(n log n);O(n log n);Não;100000;Já Ordenado;ID da Imagem;32.2768;3;OK
+Bubble Sort;O(n²);O(n²);Sim;100000;Inversamente Ordenado;ID da Imagem;51847.6754;3;OK
+Insertion Sort;O(n²);O(n²);Sim;100000;Inversamente Ordenado;ID da Imagem;44269.4307;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;100000;Inversamente Ordenado;ID da Imagem;43.5912;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;100000;Inversamente Ordenado;ID da Imagem;12.7398;3;OK
+Heap Sort;O(n log n);O(n log n);Não;100000;Inversamente Ordenado;ID da Imagem;43.4078;3;OK
+Bubble Sort;O(n²);O(n²);Sim;100000;Semi-Ordenado (90%);ID da Imagem;32366.5252;3;OK
+Insertion Sort;O(n²);O(n²);Sim;100000;Semi-Ordenado (90%);ID da Imagem;1793.5160;3;OK
+Merge Sort;O(n log n);O(n log n);Sim;100000;Semi-Ordenado (90%);ID da Imagem;15.5168;3;OK
+Quick Sort (Mediana de 3);O(n log n);O(n²);Não;100000;Semi-Ordenado (90%);ID da Imagem;8.8353;3;OK
+Heap Sort;O(n log n);O(n log n);Não;100000;Semi-Ordenado (90%);ID da Imagem;28.4940;3;OK

@@ -223,6 +223,8 @@ public final class SuiteTestes {
                 "Repetições inteligentes deveria usar 1 rep para Bubble em 50k");
         garantir(cfg.calcularRepeticoesPara(new QuickSort(), 50_000) == 3,
                 "Repetições inteligentes deveria manter 3 reps para Quick em 50k");
+        garantir(ConfiguracaoBateria.padraoCompletoUniforme().calcularRepeticoesPara(new BubbleSort(), 100_000) == 3,
+                "Configuração uniforme deveria manter 3 reps para Bubble em 100k");
 
         ConfiguracaoBateria pequena = new ConfiguracaoBateria(
                 List.of(300),

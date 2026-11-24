@@ -85,6 +85,9 @@ java -jar dist/java-sort-analyzer.jar --gerar-dados dados-exemplo
 # Executar bateria de benchmark headless (1k a 100k) e salvar CSV
 java -jar dist/java-sort-analyzer.jar --benchmark resultados/benchmark.csv
 
+# Executar bateria completa com metodologia uniforme (3 repetições em todos os testes)
+java -jar dist/java-sort-analyzer.jar --benchmark resultados/benchmark.csv --uniforme
+
 # Executar bateria rápida (1k, 5k e 10k)
 java -jar dist/java-sort-analyzer.jar --benchmark resultados/benchmark_rapido.csv --rapido
 ```
