@@ -58,7 +58,7 @@ com.sortanalyzer
 O conjunto combina técnicas clássicas de complexidade quadrática $O(n^2)$ e log-linear $O(n \log n)$ para evidenciar diferenças de escalabilidade, estabilidade e uso de memória:
 
 1. **`BubbleSort` (Otimizado com parada antecipada):** interrompe a execução se nenhuma troca ocorrer em uma varredura completa, atingindo $O(n)$ em vetores já ordenados.
-2. **`InsertionSort` (Deslocamento):** realiza deslocamento de chave sem trocas sucessivas, sendo estável e altamente eficiente em entradas pequenas ou semi-ordenadas.
+2. **`InsertionSort` (Deslocamento):** realiza deslocamento de chave sem trocas sucessivas, sendo estável e eficiente em entradas pequenas ou semi-ordenadas.
 3. **`MergeSort` (Buffer auxiliar único):** aloca um único vetor auxiliar $O(n)$ no início da chamada, evita intercalação desnecessária quando `dados[meio] <= dados[meio + 1]` e preserva estabilidade.
 4. **`QuickSort` (Mediana de Três + Partição de Hoare + Eliminação de Recursão de Cauda):**
    - A mediana de três evita degradação para $O(n^2)$ em dados ordenados ou inversos.
@@ -68,9 +68,9 @@ O conjunto combina técnicas clássicas de complexidade quadrática $O(n^2)$ e l
 
 ---
 
-## 3. Metodologia de Benchmark (Rigor de Medição)
+## 3. Metodologia de Benchmark (Isolamento da Medição)
 
-- **Mesma base para todos os algoritmos:** em cada teste, gera-se ou carrega-se uma única base original (com `seed` fixa no gerador determinístico). Cada algoritmo recebe uma cópia idêntica via `Arrays.copyOf` **antes** do início do cronômetro.
+- **Mesma base para todos os algoritmos:** em cada teste, o sistema gera ou carrega uma única base original (com `seed` fixa no gerador determinístico). Cada algoritmo recebe uma cópia idêntica via `Arrays.copyOf` **antes** do início do cronômetro.
 - **Cronômetro estritamente isolado:** `System.nanoTime()` envolve **exclusivamente** a invocação `algoritmo.ordenar(copia, comparador)`, excluindo leitura de disco, geração de registros, clonagem, autoverificação e renderização.
 - **Autoverificação pós-ordenação:** `VerificadorOrdenacao` valida tanto a ordenação monotônica quanto a integridade do multiconjunto (nenhum registro perdido ou duplicado).
 - **Warm-up da JVM e Repetições Inteligentes:** na bateria em lote, uma etapa opcional de aquecimento reduz o impacto inicial do compilador JIT; em entradas grandes ($\ge 25.000$), algoritmos $O(n^2)$ podem usar 1 repetição cronometrada (configurável) enquanto $O(n \log n)$ mantém a média de múltiplas rodadas.

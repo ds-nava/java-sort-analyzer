@@ -2,6 +2,7 @@ package com.sortanalyzer.ui;
 
 import com.formdev.flatlaf.fonts.inter.FlatInterFont;
 import com.sortanalyzer.model.ResultadoOrdenacao;
+import com.sortanalyzer.model.TipoCenario;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -17,6 +18,8 @@ import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +30,9 @@ import java.util.Locale;
  * tema claro/escuro e exportação direta em PNG de alta resolução.
  */
 public final class PainelGraficoComparativo extends JPanel {
+
+    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
+    private static final DecimalFormatSymbols SIMBOLOS_PT_BR = DecimalFormatSymbols.getInstance(PT_BR);
 
     private List<ResultadoOrdenacao> resultados = new ArrayList<>();
     private String titulo = "Comparativo de Tempo de Ordenação (ms)";
@@ -119,47 +125,81 @@ public final class PainelGraficoComparativo extends JPanel {
             return;
         }
 
-        int left = 68;
-        int right = 20;
-        int top = 46;
-        int bottom = 46;
+        boolean compacto = h < 190;
+        int left = 74;
+        int right = 24;
+        int top = compacto ? 42 : (h < 220 ? 48 : 56);
+        int bottom = compacto ? 34 : (h < 220 ? 44 : 50);
         int areaW = Math.max(80, w - left - right);
-        int areaH = Math.max(55, h - top - bottom);
+        int areaH = Math.max(30, h - top - bottom);
 
-        double maxValor = 0.001;
         int idxMaisRapido = -1;
         double menorTempo = Double.MAX_VALUE;
+        double maxTempo = 0.0;
+        double minPos = Double.MAX_VALUE;
+        double maxPos = 0.0;
         for (int i = 0; i < resultados.size(); i++) {
             ResultadoOrdenacao r = resultados.get(i);
-            double v = transformar(r.getTempoMilissegundos());
-            if (v > maxValor) maxValor = v;
+            double ms = Math.max(0.0, r.getTempoMilissegundos());
+            if (ms > maxTempo) maxTempo = ms;
+            double msPos = Math.max(0.01, ms);
+            if (msPos < minPos) minPos = msPos;
+            if (msPos > maxPos) maxPos = msPos;
             if (r.isOrdenadoCorretamente() && r.getTempoMilissegundos() < menorTempo) {
                 menorTempo = r.getTempoMilissegundos();
                 idxMaisRapido = i;
             }
         }
-        maxValor *= 1.18;
 
         // Linhas horizontais de grade tracejadas e eixo Y
         g2.setFont(new Font(FlatInterFont.FAMILY, Font.PLAIN, 10));
         FontMetrics fmY = g2.getFontMetrics();
         Stroke originalStroke = g2.getStroke();
         Stroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 4f, new float[]{3f, 3f}, 0f);
-        int divisoes = 4;
-        for (int d = 0; d <= divisoes; d++) {
-            int y = top + areaH - (int) Math.round((areaH * d) / (double) divisoes);
-            if (d > 0) {
-                g2.setStroke(dashed);
-                g2.setColor(corGrade);
-                g2.drawLine(left, y, left + areaW, y);
-                g2.setStroke(originalStroke);
-            }
 
-            double valEixo = (maxValor * d) / divisoes;
-            double msReal = escalaLogaritmica ? (Math.pow(10.0, valEixo) - 1.0) : valEixo;
-            String rotuloY = formatarEixoMs(msReal);
-            g2.setColor(textoSecundario);
-            g2.drawString(rotuloY, left - fmY.stringWidth(rotuloY) - 8, y + 4);
+        int minExp = 0;
+        int maxExp = 1;
+        double tetoLinear = 1.0;
+
+        if (escalaLogaritmica) {
+            minExp = (int) Math.floor(Math.log10(minPos));
+            if (Math.log10(minPos) - minExp < 0.15) {
+                minExp--;
+            }
+            maxExp = (int) Math.ceil(Math.log10(maxPos));
+            if (maxExp <= minExp) {
+                maxExp = minExp + 1;
+            }
+            int span = maxExp - minExp;
+            for (int exp = minExp; exp <= maxExp; exp++) {
+                double frac = (exp - minExp) / (double) span;
+                int y = top + areaH - (int) Math.round(areaH * frac);
+                if (exp > minExp) {
+                    g2.setStroke(dashed);
+                    g2.setColor(corGrade);
+                    g2.drawLine(left, y, left + areaW, y);
+                    g2.setStroke(originalStroke);
+                }
+                String rotuloY = formatarEixoLog(exp);
+                g2.setColor(textoSecundario);
+                g2.drawString(rotuloY, left - fmY.stringWidth(rotuloY) - 10, y + 4);
+            }
+        } else {
+            tetoLinear = calcularTetoLinear(maxTempo);
+            int divisoes = 4;
+            for (int d = 0; d <= divisoes; d++) {
+                int y = top + areaH - (int) Math.round((areaH * d) / (double) divisoes);
+                if (d > 0) {
+                    g2.setStroke(dashed);
+                    g2.setColor(corGrade);
+                    g2.drawLine(left, y, left + areaW, y);
+                    g2.setStroke(originalStroke);
+                }
+                double msReal = (tetoLinear * d) / divisoes;
+                String rotuloY = formatarEixoLinear(msReal);
+                g2.setColor(textoSecundario);
+                g2.drawString(rotuloY, left - fmY.stringWidth(rotuloY) - 10, y + 4);
+            }
         }
 
         // Eixo X base
@@ -173,12 +213,24 @@ public final class PainelGraficoComparativo extends JPanel {
 
         Font fonteValor = new Font(FlatInterFont.FAMILY, Font.BOLD, 10);
         Font fonteLabel = new Font(FlatInterFont.FAMILY, Font.BOLD, 10);
-        Font fonteComp = new Font(FlatInterFont.FAMILY, Font.PLAIN, 10);
+        Font fonteComp = new Font(FlatInterFont.FAMILY, Font.PLAIN, compacto ? 9 : 10);
+        int offsetNome = compacto ? 14 : 17;
+        int offsetComp = compacto ? 27 : 32;
+        DecimalFormat formatoValor = new DecimalFormat("#,##0.00", SIMBOLOS_PT_BR);
+        double baseMinLog = Math.pow(10.0, minExp);
 
         for (int i = 0; i < n; i++) {
             ResultadoOrdenacao r = resultados.get(i);
-            double v = transformar(r.getTempoMilissegundos());
-            int barH = Math.max(4, (int) Math.round((v / maxValor) * areaH));
+            double ms = Math.max(0.0, r.getTempoMilissegundos());
+            double frac;
+            if (escalaLogaritmica) {
+                double logVal = Math.log10(Math.max(baseMinLog, ms));
+                frac = (logVal - minExp) / (double) (maxExp - minExp);
+                frac = Math.max(0.0, Math.min(1.0, frac));
+            } else {
+                frac = Math.max(0.0, Math.min(1.0, ms / tetoLinear));
+            }
+            int barH = Math.max(4, (int) Math.round(frac * areaH));
             int cx = left + (int) Math.round((i + 0.5) * slotW);
             int bx = cx - barW / 2;
             int by = top + areaH - barH;
@@ -188,7 +240,7 @@ public final class PainelGraficoComparativo extends JPanel {
 
             // Rótulo de tempo acima da barra
             g2.setFont(fonteValor);
-            String txtMs = String.format(Locale.US, "%.2f ms", r.getTempoMilissegundos());
+            String txtMs = formatoValor.format(r.getTempoMilissegundos()) + " ms";
             if (i == idxMaisRapido && n > 1) {
                 txtMs = "★ " + txtMs;
             }
@@ -201,29 +253,73 @@ public final class PainelGraficoComparativo extends JPanel {
             String nomeCurto = encurtarNome(r.getNomeAlgoritmo());
             FontMetrics fmLbl = g2.getFontMetrics();
             g2.setColor(textoPrincipal);
-            g2.drawString(nomeCurto, cx - fmLbl.stringWidth(nomeCurto) / 2, top + areaH + 16);
+            g2.drawString(nomeCurto, cx - fmLbl.stringWidth(nomeCurto) / 2, top + areaH + offsetNome);
 
             g2.setFont(fonteComp);
-            String comp = r.getComplexidadeMedia();
+            String comp = formatarComplexidadeEixo(r);
             FontMetrics fmComp = g2.getFontMetrics();
             g2.setColor(textoSecundario);
-            g2.drawString(comp, cx - fmComp.stringWidth(comp) / 2, top + areaH + 30);
+            g2.drawString(comp, cx - fmComp.stringWidth(comp) / 2, top + areaH + offsetComp);
         }
     }
 
-    private double transformar(double ms) {
-        double seguro = Math.max(0.0, ms);
-        return escalaLogaritmica ? Math.log10(seguro + 1.0) : seguro;
+    private double calcularTetoLinear(double maxValor) {
+        double alvo = Math.max(0.01, maxValor * 1.08);
+        double exp = Math.floor(Math.log10(alvo));
+        double base = Math.pow(10.0, exp);
+        double norm = alvo / base;
+        double fator;
+        if (norm <= 1.0) fator = 1.0;
+        else if (norm <= 2.0) fator = 2.0;
+        else if (norm <= 2.5) fator = 2.5;
+        else if (norm <= 4.0) fator = 4.0;
+        else if (norm <= 5.0) fator = 5.0;
+        else if (norm <= 8.0) fator = 8.0;
+        else fator = 10.0;
+        return fator * base;
     }
 
-    private String formatarEixoMs(double ms) {
+    private String formatarEixoLog(int exp) {
+        double val = Math.pow(10.0, exp);
+        if (exp >= 3) {
+            return Math.round(val / 1000.0) + " s";
+        }
+        if (exp >= 0) {
+            return Math.round(val) + " ms";
+        }
+        return String.format(PT_BR, "%.2f ms", val);
+    }
+
+    private String formatarEixoLinear(double ms) {
+        if (ms <= 1e-9) {
+            return "0 ms";
+        }
         if (ms >= 1000.0) {
-            return String.format(Locale.US, "%.1fs", ms / 1000.0);
+            double seg = ms / 1000.0;
+            if (Math.abs(seg - Math.round(seg)) < 1e-6) {
+                return String.format(PT_BR, "%.0f s", seg);
+            }
+            return String.format(PT_BR, "%.1f s", seg);
         }
         if (ms >= 10.0) {
-            return String.format(Locale.US, "%.0fms", ms);
+            return String.format(PT_BR, "%.0f ms", ms);
         }
-        return String.format(Locale.US, "%.2fms", ms);
+        if (ms >= 1.0) {
+            if (Math.abs(ms - Math.round(ms)) < 1e-6) {
+                return String.format(PT_BR, "%.0f ms", ms);
+            }
+            return String.format(PT_BR, "%.1f ms", ms);
+        }
+        return String.format(PT_BR, "%.2f ms", ms);
+    }
+
+    private String formatarComplexidadeEixo(ResultadoOrdenacao r) {
+        String nome = r.getNomeAlgoritmo();
+        if (r.getCenario() == TipoCenario.ORDENADO
+                && (nome.startsWith("Bubble") || nome.startsWith("Insertion"))) {
+            return "O(n) (melhor caso)";
+        }
+        return r.getComplexidadeMedia() + " (médio)";
     }
 
     private String encurtarNome(String nome) {

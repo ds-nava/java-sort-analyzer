@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-17%20LTS-0f766e?style=flat-square&logo=openjdk&logoColor=white)
 ![UI](https://img.shields.io/badge/UI-Swing%20%2B%20Java%202D-1d4ed8?style=flat-square)
-![Dependencies](https://img.shields.io/badge/Runtime%20Dependencies-Zero-10b981?style=flat-square)
+![Dependencies](https://img.shields.io/badge/Algoritmos-Zero%20Deps%20(UI%3A%20FlatLaf)-10b981?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-475569?style=flat-square)
 
 Aplicação desktop em **Java 17 (Swing + Java 2D)** para **análise comparativa de desempenho** e **visualização animada** de algoritmos clássicos de ordenação.
@@ -15,8 +15,8 @@ Aplicação desktop em **Java 17 (Swing + Java 2D)** para **análise comparativa
 
 - **Análise & Catálogo (Aba 1):**
   - **3 fontes de dados:** geração interna determinística (até 100.000+ imagens com *seed* configurável), importação de arquivos externos `.csv` / `.txt` (detecção automática de catálogo completo ou lista numérica simples + relatório de linhas inválidas) e entrada manual direta.
-  - **Medição rigorosa:** todos os algoritmos ordenam cópias idênticas da mesma base, com cronômetro isolado via `System.nanoTime()` (excluindo leitura, geração, clonagem e exibição) e autoverificação automática.
-  - **Tabelas paginadas Antes e Depois:** inspeção fluida de 100.000+ registros sem congelamento da interface.
+  - **Medição isolada:** todos os algoritmos ordenam cópias idênticas da mesma base, com cronômetro via `System.nanoTime()` exclusivamente ao redor da ordenação (excluindo leitura, geração, clonagem e exibição) e autoverificação automática.
+  - **Tabelas paginadas Antes e Depois:** inspeção de 100.000+ registros sem congelamento da interface.
   - **Gráfico Java 2D nativo:** alternância entre escala linear e logarítmica + exportação em **PNG** de alta resolução e **CSV**.
 - **Visualizador Animado (Aba 2):**
   - **Modo Individual:** reprodução passo a passo (`Play`, `Pausar`, `< Passo`, `Passo >`, `Reiniciar`), controle de velocidade, cenários e contadores ao vivo de comparações e movimentações.
@@ -38,24 +38,26 @@ Aplicação desktop em **Java 17 (Swing + Java 2D)** para **análise comparativa
 
 ---
 
-## Amostra de Resultados (Benchmark CLI — `n = 10.000`, média de 3 execuções)
+## Amostra de Resultados (Benchmark Oficial — `n = 10.000`, média de 3 execuções)
 
-| Algoritmo | Aleatório | Já Ordenado | Inverso | Semi-Ordenado (90%) |
+Valores registrados em [`docs/resultados/benchmark_uniforme.csv`](docs/resultados/benchmark_uniforme.csv) (`seed = 42`, critério `ID da Imagem`, *warm-up* prévio da JVM em Linux `amd64` / OpenJDK 21):
+
+| Algoritmo | Aleatório | Já Ordenado | Inversamente Ordenado | Semi-Ordenado (90%) |
 | :--- | ---: | ---: | ---: | ---: |
-| **Bubble Sort** | 172,09 ms | **0,02 ms** | 112,97 ms | 75,54 ms |
-| **Insertion Sort** | 56,00 ms | **0,03 ms** | 113,41 ms | **6,45 ms** |
-| **Merge Sort** | 1,10 ms | 0,18 ms | 0,39 ms | 0,42 ms |
-| **Quick Sort (Mediana de 3)** | **0,96 ms** | 0,17 ms | **0,17 ms** | **0,28 ms** |
-| **Heap Sort** | 1,34 ms | 0,87 ms | 0,82 ms | 0,87 ms |
+| **Bubble Sort** | 407,04 ms | **0,06 ms** | 340,43 ms | 188,90 ms |
+| **Insertion Sort** | 98,91 ms | 0,08 ms | 199,13 ms | 11,19 ms |
+| **Merge Sort** | 4,43 ms | 0,11 ms | 1,20 ms | 0,99 ms |
+| **Quick Sort (Mediana de 3)** | **2,10 ms** | 0,87 ms | **0,48 ms** | **0,59 ms** |
+| **Heap Sort** | 3,16 ms | 2,02 ms | 1,95 ms | 2,20 ms |
 
-> Os tempos exatos variam conforme o hardware e a JVM utilizada. Para reproduzir no seu computador, utilize a Aba 3 ou o modo `--benchmark` abaixo.
+> Os tempos absolutos variam conforme o hardware e a JVM utilizada. Para reproduzir no seu computador, utilize a Aba 3 ou o modo `--benchmark` abaixo.
 
 ---
 
 ## Como Compilar e Executar
 
 ### Requisitos
-- **JDK 17 ou superior** (não requer bibliotecas externas em runtime).
+- **JDK 17 ou superior** (não requer bibliotecas externas para os algoritmos ou testes; utiliza apenas `FlatLaf` e `flatlaf-fonts-inter` na interface Swing, baixados automaticamente pelo Maven ou pelos scripts de build).
 
 ### Build rápido (apenas JDK — funciona offline)
 
